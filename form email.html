@@ -88,22 +88,49 @@
     </nav>
 
     <div class="formWhat mx-auto max-w-md space-y-4">
-      <form action="#" class="inputTeks contactBawah" onsubmit="kirimPesan()">
-        <label for="nama" class="text-light text-lg mt-1 mb-2 font-bold shadow-lg label">enter your name or company name</label>
-        <input type="text" id="nama" class="w-full rounded-lg border border-primary shadow-sm teks" />
-        <br />
-        <label for="pesan" class="text-light text-lg mt-1 mb-2 font-bold shadow-lg label">enter message</label>
-        <input type="text" id="pesan" class="w-full rounded-lg border border-primary shadow-sm teks" />
-        <input type="submit" value="kirim" class="text-light bg-primary px-8 py-3 rounded-full hover:opacity-55 contactButton" />
+      <form id="my-form" action="https://formspree.io/f/mwkgywva" method="POST" class="inputTeks contactBawah">
+        <label class="text-light text-lg mt-1 mb-2 font-bold shadow-lg label">Email:</label>
+        <input type="email" name="email" class="w-full rounded-lg border border-primary shadow-sm teks" />
+        <label class="text-light text-lg mt-1 mb-2 font-bold shadow-lg label">Message:</label>
+        <input type="text" name="message" class="w-full rounded-lg border border-primary shadow-sm teks" required="" />
+        <button id="my-form-button" class="text-light bg-primary px-8 py-3 rounded-full hover:opacity-55 contactButton">Submit</button>
+        <p id="my-form-status" class="text-light text-lg mt-3 mb-1 pt-4 font-bold label"></p>
       </form>
     </div>
     <script src="script.js"></script>
     <script>
-      function kirimPesan() {
-        const urlWhats = `https://wa.me/6289509732055?text=assalamualaikum saya ${nama.value}, ${pesan.value}&type=phone_number&app_absent=0`;
+      var form = document.getElementById("my-form");
 
-        window.open(urlWhats, "_blank");
+      async function handleSubmit(event) {
+        event.preventDefault();
+        var status = document.getElementById("my-form-status");
+        var data = new FormData(event.target);
+        fetch(event.target.action, {
+          method: form.method,
+          body: data,
+          headers: {
+            Accept: "application/json",
+          },
+        })
+          .then((response) => {
+            if (response.ok) {
+              status.innerHTML = "Thanks for your submission!";
+              form.reset();
+            } else {
+              response.json().then((data) => {
+                if (Object.hasOwn(data, "errors")) {
+                  status.innerHTML = data["errors"].map((error) => error["message"]).join(", ");
+                } else {
+                  status.innerHTML = "Oops! There was a problem submitting your form";
+                }
+              });
+            }
+          })
+          .catch((error) => {
+            status.innerHTML = "Oops! There was a problem submitting your form";
+          });
       }
+      form.addEventListener("submit", handleSubmit);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
